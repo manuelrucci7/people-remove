@@ -7,17 +7,20 @@ from detection import Detection
 filepath = "images/bus.jpg"
 conf = {
     "detection": {
-        "model_path": "models/yolov8m.pt",
+        "model_path": "models/yolov8n.pt",
         "classes": {
             "person": 0.1,
         },
-        "device": "cpu",
-        "model_size": 1920,
+        "device": 0,
+        "model_size_width": 1920,
+        "model_size_height": 1280,
     }
 }
 im = cv2.imread(filepath, cv2.IMREAD_COLOR)
 
 det = Detection(conf["detection"])
+#det = Segmentation(conf["detection"])
+
 model_path = "models/migan_512_places2.pt"
 inpainting = MiganInpainting(model_path)
 
@@ -29,6 +32,7 @@ if not cap.isOpened():
     print("Error opening video file")
 
 # Read until video is completed
+i = 0
 while(cap.isOpened()):
   
   # Capture frame-by-frame
@@ -48,14 +52,14 @@ while(cap.isOpened()):
     # ---------------------------------
     
     # Display the resulting frame
-    cv2.imwrite("images/rome.jpg", result)
-    
-    cv2.imshow('Frame', result)
-    cv2.waitKey(0)
+    cv2.imwrite(f"videos/results/rome_{i}.png", result)
+    i=i+1
+    #cv2.imshow('Frame', result)
+    #cv2.waitKey(0)
 
     # Press Q on keyboard to exit
-    if cv2.waitKey(33) & 0xFF == ord('q'):
-      break
+    #if cv2.waitKey(33) & 0xFF == ord('q'):
+    #  break
 
   # Break the loop
   else: 

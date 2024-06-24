@@ -7,8 +7,8 @@ class Segmentation:
     def __init__(self, conf):
         self.device = conf["device"]
         self.model = YOLO(conf["model_path"])
-        self.img_size = conf["model_size"]
-        self.conf_thres = 0.5
+        self.img_size = [conf["model_size_width"], conf["model_size_height"]]
+        self.conf_thres = 0.1
         self.iou_thres = 0.5
         self.classes = conf["classes"]
         
@@ -16,7 +16,7 @@ class Segmentation:
         im_draw_list = []
         mask_list = []
                
-        results = self.model(im, imgsz=self.img_size, conf=self.conf_thres, iou=self.iou_thres, device=torch.device(self.device), verbose=False)
+        results = self.model(im, imgsz=self.img_size, conf=self.conf_thres, iou=self.iou_thres, device=torch.device(self.device), verbose=True)
         
         for i in range(0, len(results)):
             im_draw=im.copy()
@@ -74,7 +74,8 @@ if __name__ == "__main__":
                 "person": 0.5,
             },
             "device": "cpu",
-            "model_size": 640,
+            "model_size_width": 640,
+            "model_size_height": 640,
         }
     }
     im = cv2.imread(filepath, cv2.IMREAD_COLOR)

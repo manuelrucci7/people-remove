@@ -7,7 +7,7 @@ class Detection:
     def __init__(self, conf):
         self.device = conf["device"]
         self.model = YOLO(conf["model_path"])
-        self.img_size = conf["model_size"]
+        self.img_size = [conf["model_size_width"], conf["model_size_height"]]
         self.conf_thres = 0.1
         self.iou_thres = 0.5
         self.classes = conf["classes"]
@@ -53,7 +53,8 @@ if __name__ == "__main__":
                 "person": 0.5,
             },
             "device": "cpu",
-            "model_size": 640,
+            "model_size_width": 640,
+            "model_size_height": 640,
         }
     }
     im = cv2.imread(filepath, cv2.IMREAD_COLOR)
