@@ -55,9 +55,12 @@ class Segmentation:
                             cv2.putText(im_draw, f"{names[class_id]}: {score:.2f}", (x1, y1+20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
                             cv2.rectangle(im_draw, (x1, y1), (x2, y2), (0, 255, 0), 1)
             mask_total = np.clip(mask_total, 0, 255)
+            kernel = np.ones((5, 5), np.uint8) 
+            mask_total = cv2.dilate( mask_total, kernel, iterations=1)
             #cv2.imshow("mask", mask_total)
             #cv2.waitKey(0)
             #cv2.destroyAllWindows()
+            im_draw = np.array( results[i].plot() )
             im_draw_list.append(im_draw)
             mask_list.append(mask_total)
 
@@ -71,9 +74,9 @@ if __name__ == "__main__":
         "detection": {
             "model_path": "models/yolov8n-seg.pt",
             "classes": {
-                "person": 0.5,
+                "person": 0.1,
             },
-            "device": "cpu",
+            "device": "cuda",
             "model_size_width": 640,
             "model_size_height": 640,
         }
@@ -86,5 +89,7 @@ if __name__ == "__main__":
     mask = mask_list[0]
     #cv2.imshow("im_draw", im_draw)
     #cv2.imshow("mask", mask)
+    im_draw = cv2.cvtColor(im_draw, cv2.COLOR_RGB2BGR)
+    cv2.imwrite("images/draw_seg.png", im_draw)
     cv2.imwrite("images/mask_seg.jpg", mask)
     #cv2.waitKey(0)

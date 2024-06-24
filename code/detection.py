@@ -16,8 +16,8 @@ class Detection:
         im_draw_list = []
         mask_list = []
 
-        results = self.model(im, imgsz=self.img_size, conf=self.conf_thres, iou=self.iou_thres, device=torch.device(self.device), verbose=False)
-        
+        results = self.model(im, imgsz=self.img_size, conf=self.conf_thres, iou=self.iou_thres, device=torch.device(self.device), verbose=True)
+
         for i in range(0, len(results)):
             im_draw=im.copy()
             maskf = np.zeros(im.shape[:2], dtype=np.uint8)
@@ -38,6 +38,8 @@ class Detection:
                         cv2.putText(im_draw, f"{names[class_id]}: {score:.2f}", (x1, y1+20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
                         cv2.rectangle(im_draw, (x1, y1), (x2, y2), (0, 255, 0), 1)
             
+            kernel = np.ones((5, 5), np.uint8) 
+            maskf = cv2.dilate( maskf, kernel, iterations=2)
             im_draw_list.append(im_draw)
             mask_list.append(maskf)
 
@@ -50,20 +52,25 @@ if __name__ == "__main__":
         "detection": {
             "model_path": "models/yolov8n.pt",
             "classes": {
-                "person": 0.5,
+                "person": 0.1,
             },
-            "device": "cpu",
+            "device": "cuda",
             "model_size_width": 640,
             "model_size_height": 640,
         }
     }
+    # Read image
     im = cv2.imread(filepath, cv2.IMREAD_COLOR)
+    im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 
+    # Creo la classe
     det = Detection(conf["detection"])
     im_draw_list, mask_list = det.detect(im)
     im_draw = im_draw_list[0]
     mask = mask_list[0]
     #cv2.imshow("im_draw", im_draw)
     #cv2.imshow("mask", mask)
+    im_draw = cv2.cvtColor(im_draw, cv2.COLOR_RGB2BGR)
+    cv2.imwrite("images/draw_det.png", im_draw)
     cv2.imwrite("images/mask_det.jpg", mask)
     #cv2.waitKey(0)

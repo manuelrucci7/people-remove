@@ -11,6 +11,8 @@ class MiganInpainting:
         self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
         self.size = size[0]
+        self.device = torch.device("cuda")
+        self.model = self.model.to(self.device)
 
     def inpaint(self, img, mask):
         #dilate mask
@@ -28,6 +30,7 @@ class MiganInpainting:
         mask_resized = resize(mask, max_size=self.size, interpolation=Image.NEAREST)
 
         x = preprocess(img_resized, mask_resized, self.size)
+        x = x.to(self.device)
 
         with torch.no_grad():
             result_image = self.model(x)[0]
@@ -63,15 +66,17 @@ if __name__ == "__main__":
     filepath = "images/bus.jpg"
     im = cv2.imread(filepath, cv2.IMREAD_COLOR)
     im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-    mask = cv2.imread("images/mask_det.jpg", cv2.IMREAD_GRAYSCALE)
-    #mask = cv2.imread("images/mask_seg.jpg", cv2.IMREAD_GRAYSCALE)
+    #mask = cv2.imread("images/mask_det.jpg", cv2.IMREAD_GRAYSCALE)
+    mask = cv2.imread("images/mask_seg.jpg", cv2.IMREAD_GRAYSCALE)
     mask = cv2.resize(mask, (im.shape[1], im.shape[0]))
+
     # Inpainting
+    #device = torch.device("cuda")
     model_path = "models/migan_512_places2.pt"
     inpainting = MiganInpainting(model_path)
     result = inpainting.inpaint(im, mask)
     result = cv2.cvtColor(result, cv2.COLOR_RGB2BGR)
-    cv2.imwrite("images/result.jpg", result)    
+    cv2.imwrite("images/result_seg.jpg", result)    
     #cv2.imshow("result", result)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
