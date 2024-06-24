@@ -41,15 +41,17 @@ while(cap.isOpened()):
     im_draw = im_draw_list[0]
     mask = mask_list[0]
 
-    cv2.imshow('Frame', im_draw)
-    cv2.waitKey(0)
+    #cv2.imshow('Frame', im_draw)
+    #cv2.waitKey(0)
     # Inpainting
     result = inpainting.inpaint(frame, mask)
-    result = cv2.resize(result, (640, 640))
     # ---------------------------------
     
     # Display the resulting frame
+    cv2.imwrite("images/rome.jpg", result)
+    
     cv2.imshow('Frame', result)
+    cv2.waitKey(0)
 
     # Press Q on keyboard to exit
     if cv2.waitKey(33) & 0xFF == ord('q'):

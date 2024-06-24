@@ -8,7 +8,7 @@ class Detection:
         self.device = conf["device"]
         self.model = YOLO(conf["model_path"])
         self.img_size = conf["model_size"]
-        self.conf_thres = 0.5
+        self.conf_thres = 0.1
         self.iou_thres = 0.5
         self.classes = conf["classes"]
         
