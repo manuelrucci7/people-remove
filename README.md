@@ -1,4 +1,7 @@
 # people-remove
+
+https://lightning.ai/ruccimanuel7/studios/people-remove-yolo-migan
+
 Remove people from images using ultralitycs yolo and migan inpainting
 
 ## Setup
