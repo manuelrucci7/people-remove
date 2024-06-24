@@ -1,4 +1,25 @@
 import cv2
+from inpainting import MiganInpainting
+from segmentation import Segmentation
+from detection import Detection
+
+# Read Image
+filepath = "images/bus.jpg"
+conf = {
+    "detection": {
+        "model_path": "models/yolov8m.pt",
+        "classes": {
+            "person": 0.1,
+        },
+        "device": "cpu",
+        "model_size": 1920,
+    }
+}
+im = cv2.imread(filepath, cv2.IMREAD_COLOR)
+
+det = Detection(conf["detection"])
+model_path = "models/migan_512_places2.pt"
+inpainting = MiganInpainting(model_path)
 
 # Create a VideoCapture object
 cap = cv2.VideoCapture('videos/rome-1920-1080-10fps-short.mp4')
@@ -14,11 +35,24 @@ while(cap.isOpened()):
   ret, frame = cap.read()
   if ret == True:
 
+    # ---------------------------------
+    # Segmentation
+    im_draw_list, mask_list = det.detect(frame)
+    im_draw = im_draw_list[0]
+    mask = mask_list[0]
+
+    cv2.imshow('Frame', im_draw)
+    cv2.waitKey(0)
+    # Inpainting
+    result = inpainting.inpaint(frame, mask)
+    result = cv2.resize(result, (640, 640))
+    # ---------------------------------
+    
     # Display the resulting frame
-    cv2.imshow('Frame', frame)
+    cv2.imshow('Frame', result)
 
     # Press Q on keyboard to exit
-    if cv2.waitKey(25) & 0xFF == ord('q'):
+    if cv2.waitKey(33) & 0xFF == ord('q'):
       break
 
   # Break the loop
